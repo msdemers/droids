@@ -16,26 +16,24 @@ def keyboard_callback(keycode):
     """Handle key presses from the MuJoCo viewer. This function is called whenever a key is pressed while the viewer is active."""
     
     try:
-        # convert numeric keycode to character
-        key = chr(keycode).lower()
-        match key:
-            case 'w':
+        match keycode:
+            case 265:
                 control.forward = 5.0  # Move forward
                 control.last_update = time.time()  # Update the last update time
-            case 's':
+            case 264:
                 control.forward = -5.0 # Move backward
                 control.last_update = time.time()
-            case 'a':
+            case 263:
                 control.turn = 5.0     # Turn left
                 control.last_update = time.time()
-            case 'd':
+            case 262:
                 control.turn = -5.0    # Turn right
                 control.last_update = time.time()
-            case ' ':
+            case 32:
                 control.forward = 0.0  # Stop forward/backward movement
                 control.last_update = time.time()
     except ValueError:
-        # Ignore non-character key presses
+        # Ignore weirdness with keyboard shortcuts defined for the viewer
         pass
             
 
