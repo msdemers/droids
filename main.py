@@ -1,4 +1,5 @@
 import time
+import os
 import mujoco
 import mujoco.viewer
 
@@ -10,16 +11,13 @@ def keyboard_callback(keycode):
 def main():
     print("Welcome to Droids!")
 
-    """Initialize the simulation and run the game loop."""
-    xml_string = """
-    <mujoco>
-        <worldbody>
-            <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
-            <geom type="plane" size="1 1 0.1" rgba=".9 0 0 1"/>
-        </worldbody>
-    </mujoco>
-    """
-    model = mujoco.MjModel.from_xml_string(xml_string)
+    # locate assets
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    assets_dir = os.path.join(current_dir, "assets")
+    scene_path = os.path.join(assets_dir, "scene.xml")
+
+    # initialize the scene and simulation
+    model = mujoco.MjModel.from_xml_path(scene_path)
     data = mujoco.MjData(model)
 
     # Launch the passive viewer for rendering the sim/game
