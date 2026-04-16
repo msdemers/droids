@@ -8,30 +8,26 @@ class RoverControl:
     def __init__(self):
         self.forward = 0.0
         self.turn = 0.0
-        self.last_update = time.time()
+        self.throttle_step = 10.0
+        self.max_throttle = 30.0
 
 control = RoverControl()
 
 def keyboard_callback(keycode):
-    """Handle key presses from the MuJoCo viewer. This function is called whenever a key is pressed while the viewer is active."""
-    
+    """Handles key presses from the MuJoCo viewer using a Throttle system."""    
     try:
         match keycode:
             case 265:
-                control.forward = 5.0  # Move forward
-                control.last_update = time.time()  # Update the last update time
+                control.forward = min(control.forward + control.throttle_step, control.max_throttle)
             case 264:
-                control.forward = -5.0 # Move backward
-                control.last_update = time.time()
+                control.forward = max(control.forward - control.throttle_step, -control.max_throttle)
             case 263:
-                control.turn = 5.0     # Turn left
-                control.last_update = time.time()
+                control.turn = min(control.turn + control.throttle_step, control.max_throttle)     # Turn left
             case 262:
-                control.turn = -5.0    # Turn right
-                control.last_update = time.time()
+                control.turn = max(control.turn - control.throttle_step, -control.max_throttle)    # Turn right
             case 32:
                 control.forward = 0.0  # Stop forward/backward movement
-                control.last_update = time.time()
+                control.turn = 0.0     # Stop turning
     except ValueError:
         # Ignore weirdness with keyboard shortcuts defined for the viewer
         pass
@@ -69,13 +65,9 @@ def main():
         while viewer.is_running():
             step_start_time = time.time()
 
-            # check for release of keys, accounting for delay
-            if time.time() - control.last_update > 0.1:
-                control.forward = 0.0
-                control.turn = 0.0
 
             # convert control inputs to left/right wheel inputs
-            # mapping represent a skid-steer control scheme
+            # mapping represent a skid-steer throttle-control scheme
             left_torque = control.forward - control.turn
             right_torque = control.forward + control.turn
 
