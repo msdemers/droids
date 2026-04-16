@@ -61,6 +61,21 @@ def main():
 
     # Launch the passive viewer for rendering the sim/game
     with mujoco.viewer.launch_passive(model, data, key_callback=keyboard_callback) as viewer:
+        
+        # --- CAMERA TRACKING SETUP ---
+        # Get the internal ID of the rover body
+        rover_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "player_rover")
+        
+        # Tell the camera to track the rover body
+        viewer.cam.type = mujoco.mjtCamera.mjCAMERA_TRACKING
+        viewer.cam.trackbodyid = rover_id
+        
+        # Adjust the camera angle and distance (TODO tune these!)
+        viewer.cam.distance = 4.0      # How far away the camera is
+        viewer.cam.elevation = -30.0   # Angle looking down (negative means looking down)
+        viewer.cam.azimuth = 90.0      # Orbit angle around the rover
+        # -----------------------------
+        
         # Run the simulation loop
         while viewer.is_running():
             step_start_time = time.time()
