@@ -1,12 +1,60 @@
 <mujoco>
-    <option gravity="0 0 0"/> 
-    
+    <option gravity="0 0 -1.62"/>
+
+    <default>
+        <joint type="hinge" axis="0 1 0"/>
+        <geom friction="1 0.005 0.0001"/>
+    </default>
+
     <worldbody>
-        <light diffuse=".8 .8 .8" pos="0 0 3" dir="0 0 -1"/>
-        
-        <body name="player_droid" pos="0 0 0">
-            <joint type="free" name="droid_root"/>
-            <geom type="capsule" size="0.1 0.2" rgba="0 0.8 0 1"/>
+        <light diffuse=".8 .8 .8" pos="0 0 5" dir="0 0 -1"/>
+
+        <geom name="ground" type="plane" size="20 20 0.1" rgba="0.4 0.4 0.4 1"/>
+
+        <body name="player_rover" pos="0 0 0.5">
+            <joint type="free" name="rover_root"/>
+            
+            <geom name="chassis" type="box" size="0.5 0.25 0.1" rgba="0.2 0.6 0.2 1" mass="10"/>
+
+            <body name="wheel_fl" pos="0.4 0.35 0">
+                <joint name="joint_fl"/>
+                <geom type="cylinder" size="0.15 0.05" rgba="0.1 0.1 0.1 1" euler="90 0 0"/>
+            </body>
+
+            <body name="wheel_fr" pos="0.4 -0.35 0">
+                <joint name="joint_fr"/>
+                <geom type="cylinder" size="0.15 0.05" rgba="0.1 0.1 0.1 1" euler="90 0 0"/>
+            </body>
+
+            <body name="wheel_ml" pos="0 0.35 0">
+                <joint name="joint_ml"/>
+                <geom type="cylinder" size="0.15 0.05" rgba="0.1 0.1 0.1 1" euler="90 0 0"/>
+            </body>
+
+            <body name="wheel_mr" pos="0 -0.35 0">
+                <joint name="joint_mr"/>
+                <geom type="cylinder" size="0.15 0.05" rgba="0.1 0.1 0.1 1" euler="90 0 0"/>
+            </body>
+
+            <body name="wheel_bl" pos="-0.4 0.35 0">
+                <joint name="joint_bl"/>
+                <geom type="cylinder" size="0.15 0.05" rgba="0.1 0.1 0.1 1" euler="90 0 0"/>
+            </body>
+
+            <body name="wheel_br" pos="-0.4 -0.35 0">
+                <joint name="joint_br"/>
+                <geom type="cylinder" size="0.15 0.05" rgba="0.1 0.1 0.1 1" euler="90 0 0"/>
+            </body>
         </body>
     </worldbody>
+
+    <actuator>
+        <motor name="motor_fl" joint="joint_fl" gear="1" ctrllimited="true" ctrlrange="-10 10"/>
+        <motor name="motor_fr" joint="joint_fr" gear="1" ctrllimited="true" ctrlrange="-10 10"/>
+        <motor name="motor_ml" joint="joint_ml" gear="1" ctrllimited="true" ctrlrange="-10 10"/>
+        <motor name="motor_mr" joint="joint_mr" gear="1" ctrllimited="true" ctrlrange="-10 10"/>
+        <motor name="motor_bl" joint="joint_bl" gear="1" ctrllimited="true" ctrlrange="-10 10"/>
+        <motor name="motor_br" joint="joint_br" gear="1" ctrllimited="true" ctrlrange="-10 10"/>
+    </actuator>
+
 </mujoco>
