@@ -14,6 +14,8 @@
         <body name="player_rover" pos="0 0 0.5">
             <joint type="free" name="rover_root"/>
             
+            <camera name="chase_cam" mode="fixed" pos="-3 0 1.5" xyaxes="0 -1 0 0.3 0 1"/>
+
             <geom name="chassis" type="box" size="0.5 0.25 0.1" rgba="0.2 0.6 0.2 1" mass="10"/>
 
             <body name="wheel_fl" pos="0.4 0.35 0">

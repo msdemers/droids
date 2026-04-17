@@ -63,12 +63,12 @@ def main():
     with mujoco.viewer.launch_passive(model, data, key_callback=keyboard_callback) as viewer:
         
         # --- CAMERA TRACKING SETUP ---
-        # Get the internal ID of the rover body
-        rover_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "player_rover")
+        # Get the internal ID of our new fixed camera
+        cam_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_CAMERA, "chase_cam")
         
-        # Tell the camera to track the rover body
-        viewer.cam.type = mujoco.mjtCamera.mjCAMERA_TRACKING
-        viewer.cam.trackbodyid = rover_id
+        # Tell the viewer to lock onto this specific fixed camera
+        viewer.cam.type = mujoco.mjtCamera.mjCAMERA_FIXED
+        viewer.cam.fixedcamid = cam_id
         
         # Adjust the camera angle and distance (TODO tune these!)
         viewer.cam.distance = 4.0      # How far away the camera is
