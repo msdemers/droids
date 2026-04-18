@@ -47,6 +47,12 @@ def main():
     model = mujoco.MjModel.from_xml_path(scene_path)
     data = mujoco.MjData(model)
 
+    # setup lighting shadow box to track the rover and ensure it casts shadows on the ground
+    light_id  = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_LIGHT, "sun_light")
+    rover_body_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "player_rover")
+    print(f"Shadow box extent radius: {model.stat.extent}")
+    SAFE_Z_HEIGHT = model.stat.extent/2
+
     # Get the internal ID numbers for our rover motors so we can control them in the simulation loop.
     left_motors = [
         mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, "motor_fl"),
@@ -79,6 +85,13 @@ def main():
         # Run the simulation loop
         while viewer.is_running():
             step_start_time = time.time()
+
+            # update the shadow box position to track the rover's position
+            print(f"Light pos before update: {model.light_pos[light_id]}")
+            rover_pos = data.xpos[rover_body_id]
+            print(f"Rover position: {rover_pos}")
+            model.light_pos[light_id] = [rover_pos[0], rover_pos[1], SAFE_Z_HEIGHT]
+            print(f"Light pos after update: {model.light_pos[light_id]}")
 
 
             # convert control inputs to left/right wheel inputs
