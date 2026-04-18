@@ -13,16 +13,21 @@
         <texture name="lunar_tex" type="2d" file="lunar_surface.png"/>
         <material name="lunar_mat" texture="lunar_tex" texrepeat="0.1 0.1" texuniform="true"/>
 
-        <texture name="moon_tex_diffuse" type="2d" file="moon_01_diff_4k.png"/>
-        <texture name="moon_tex_normal" type="2d" file="moon_01_nor_gl_4k.png"/>
-        <material name="moon_mat" texture="moon_tex_diffuse" 
-                  specular="0.0" shininess="0.0" reflectance="0.0" 
-                  texrepeat="5 5" texuniform="true"/>
-
     </asset>
 
+    <visual>
+        <headlight ambient="0 0 0" diffuse="0 0 0" specular="0 0 0" />
+        
+        <global elevation="-20" azimuth="120" />
+    </visual>
+
     <worldbody>
-        <light diffuse=".8 .8 .8" pos="0 0 5" dir="0 0 -1"/>
+        <light name="sun" 
+           directional="true" 
+           dir="1 1 -1" 
+           diffuse="0.9 0.9 0.9" 
+           specular="0.2 0.2 0.2" 
+           castshadow="true" />
 
         <geom name="ground" type="plane" size="20 20 0.1" material="lunar_mat"/>
 
@@ -66,12 +71,12 @@
     </worldbody>
 
     <actuator>
-        <motor name="motor_fl" joint="joint_fl" gear="1" ctrllimited="true" ctrlrange="-30 30"/>
-        <motor name="motor_fr" joint="joint_fr" gear="1" ctrllimited="true" ctrlrange="-30 30"/>
-        <motor name="motor_ml" joint="joint_ml" gear="1" ctrllimited="true" ctrlrange="-30 30"/>
-        <motor name="motor_mr" joint="joint_mr" gear="1" ctrllimited="true" ctrlrange="-30 30"/>
-        <motor name="motor_bl" joint="joint_bl" gear="1" ctrllimited="true" ctrlrange="-30 30"/>
-        <motor name="motor_br" joint="joint_br" gear="1" ctrllimited="true" ctrlrange="-30 30"/>
+        <motor name="motor_fl" joint="joint_fl" gear="1" ctrllimited="true" ctrlrange="-50 50"/>
+        <motor name="motor_fr" joint="joint_fr" gear="1" ctrllimited="true" ctrlrange="-50 50"/>
+        <motor name="motor_ml" joint="joint_ml" gear="1" ctrllimited="true" ctrlrange="-50 50"/>
+        <motor name="motor_mr" joint="joint_mr" gear="1" ctrllimited="true" ctrlrange="-50 50"/>
+        <motor name="motor_bl" joint="joint_bl" gear="1" ctrllimited="true" ctrlrange="-50 50"/>
+        <motor name="motor_br" joint="joint_br" gear="1" ctrllimited="true" ctrlrange="-50 50"/>
     </actuator>
 
 </mujoco>

@@ -9,7 +9,7 @@ class RoverControl:
         self.forward = 0.0
         self.turn = 0.0
         self.throttle_step = 10.0
-        self.max_throttle = 30.0
+        self.max_throttle = 50.0
 
 control = RoverControl()
 
