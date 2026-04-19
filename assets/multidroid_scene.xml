@@ -1,0 +1,38 @@
+<mujoco>
+    <option gravity="0 0 -1.62"/>
+
+    <default>
+        <joint type="hinge" axis="0 1 0" damping="5.0"/>
+        <geom friction="1 0.005 0.0001"/>
+    </default>
+
+    <asset>
+        <texture name="checker_tex" type="2d" builtin="checker" rgb1="0.3 0.3 0.3" rgb2="0.4 0.4 0.4" width="512" height="512"/>
+        <material name="checker_pattern" texture="checker_tex" texrepeat="20 20" texuniform="true"/>
+
+        <texture name="lunar_tex" type="2d" file="lunar_surface.png"/>
+        <material name="lunar_mat" texture="lunar_tex" texrepeat="0.1 0.1" texuniform="true"/>
+
+    </asset>
+
+    <visual>
+        <headlight ambient="0 0 0" diffuse="0 0 0" specular="0 0 0" />
+        <global elevation="-20" azimuth="120" />
+    </visual>
+
+    <worldbody>
+        <light name="sun_light" 
+           directional="true" 
+           pos="0 0 2"
+           dir="1 1 -1" 
+           diffuse="0.9 0.9 0.9" 
+           specular="0.2 0.2 0.2" 
+           castshadow="true" />
+
+        <geom name="ground" type="plane" size="20 20 0.1" material="lunar_mat"/>
+
+    </worldbody>
+
+    <include file="skid_steer_rover.xml"/>
+
+</mujoco>

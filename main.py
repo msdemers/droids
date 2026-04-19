@@ -41,7 +41,8 @@ def main():
     # locate assets
     current_dir = os.path.dirname(os.path.abspath(__file__))
     assets_dir = os.path.join(current_dir, "assets")
-    scene_path = os.path.join(assets_dir, "scene.xml")
+    #scene_path = os.path.join(assets_dir, "scene.xml")
+    scene_path = os.path.join(assets_dir, "multidroid_scene.xml")
 
     # initialize the scene and simulation
     model = mujoco.MjModel.from_xml_path(scene_path)
@@ -87,11 +88,11 @@ def main():
             step_start_time = time.time()
 
             # update the shadow box position to track the rover's position
-            print(f"Light pos before update: {model.light_pos[light_id]}")
+            #print(f"Light pos before update: {model.light_pos[light_id]}")
             rover_pos = data.xpos[rover_body_id]
-            print(f"Rover position: {rover_pos}")
+            #print(f"Rover position: {rover_pos}")
             model.light_pos[light_id] = [rover_pos[0], rover_pos[1], SAFE_Z_HEIGHT]
-            print(f"Light pos after update: {model.light_pos[light_id]}")
+            #print(f"Light pos after update: {model.light_pos[light_id]}")
 
 
             # convert control inputs to left/right wheel inputs
