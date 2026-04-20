@@ -1,0 +1,20 @@
+<mujoco>
+    <default>
+        <default class="enemy_rammer">
+            <geom type="box" size="0.3 0.3 0.2" rgba="0.8 0.1 0.1 1" mass="15"/>
+        </default>
+    </default>
+
+    <worldbody>
+        <body name="enemy_1" pos="5 3 0.5">
+            <joint type="free"/>
+            <geom class="enemy_rammer"/>
+        </body>
+
+        <body name="enemy_2" pos="8 -4 0.5">
+            <joint type="free"/>
+            <geom class="enemy_rammer"/>
+        </body>
+        
+        </worldbody>
+</mujoco>

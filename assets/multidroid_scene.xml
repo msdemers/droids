@@ -34,5 +34,6 @@
     </worldbody>
 
     <include file="skid_steer_rover.xml"/>
+    <include file="enemies.xml"/>
 
 </mujoco>
