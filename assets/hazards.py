@@ -4,7 +4,25 @@ import mujoco
 
 RAMMER_BASE_NAME = "rammer_"
 RAMMER_MAX_THROTTLE = 50.0
+
+
 SENTINEL_BASE_NAME = "sentinel_"
+SENTINEL_DIMENSIONS = {
+    "base_height": 0.2,
+    "base_radius": 0.4,
+    "neck_height": 0.4,
+    "neck_radius": 0.1,
+    "head_radius": 0.2,
+    "cannon_length": 0.3,
+    "cannon_radius": 0.08
+}
+SENTINEL_MASSES = {
+    "base": 50.0,
+    "neck": 5.0,
+    "head": 5.0,
+    "cannon": 2.0
+}
+
 SENTINEL_MAX_PAN_CONTROL = 100.0
 SENTINEL_MAX_TILT_CONTROL = 100.0
 
@@ -75,31 +93,36 @@ def spawn_sentinel(spec, name, x, y):
     """Programmatically builds heavy Pan-Tilt Sentinel turrets."""
     
     # --- The Heavy Base ---
-    s_base = spec.worldbody.add_body(name=f"{name}", pos=[x, y, 0.1])
+    s_base = spec.worldbody.add_body(name=f"{name}", pos=[x, y, SENTINEL_DIMENSIONS["base_height"] / 2])
     s_base.add_freejoint()
     # Mass=50 makes it incredibly hard for the player to push around
     s_base.add_geom(
         type=mujoco.mjtGeom.mjGEOM_CYLINDER, 
-        size=[0.4, 0.1], 
+        size=[SENTINEL_DIMENSIONS["base_radius"], SENTINEL_DIMENSIONS["base_height"] / 2], 
         rgba=[0.2, 0.2, 0.2, 1], 
-        mass=50.0
+        mass=SENTINEL_MASSES["base"]
     )
 
     # --- The Neck ---
     # A thin cylinder to visually separate the head from the base
-    s_neck = s_base.add_body(name=f"{name}_neck", pos=[0, 0, 0.5])
+    s_neck = s_base.add_body(name=f"{name}_neck", pos=[0, 0, SENTINEL_DIMENSIONS["neck_height"] / 2 + SENTINEL_DIMENSIONS["base_height"] / 2])
     s_neck.add_geom(
         type=mujoco.mjtGeom.mjGEOM_CYLINDER, 
-        size=[0.1, 0.4], 
+        size=[SENTINEL_DIMENSIONS["neck_radius"], SENTINEL_DIMENSIONS["neck_height"] / 2], 
         rgba=[0.2, 0.2, 0.2, 1], 
-        mass=5.0
+        mass=SENTINEL_MASSES["neck"]
     )
     
     # --- The Head (Pan / Yaw Axis) ---
     # Positioned right on top of the base (Z = +0.4)
-    s_head = s_neck.add_body(name=f"{name}_head", pos=[0, 0, 0.4])
+    s_head = s_neck.add_body(name=f"{name}_head", pos=[0, 0, SENTINEL_DIMENSIONS["head_radius"] + SENTINEL_DIMENSIONS["neck_height"] / 2])
     pan_joint = s_head.add_joint(name=f"{name}_pan", type=mujoco.mjtJoint.mjJNT_HINGE, axis=[0, 0, 1])
-    s_head.add_geom(type=mujoco.mjtGeom.mjGEOM_SPHERE, size=[0.2], rgba=[0.8, 0.6, 0.1, 1], mass=5.0)
+    s_head.add_geom(
+        type=mujoco.mjtGeom.mjGEOM_SPHERE, 
+        size=[SENTINEL_DIMENSIONS["head_radius"]], 
+        rgba=[0.8, 0.6, 0.1, 1], 
+        mass=SENTINEL_MASSES["head"]
+    )
     
     # --- The Cannon (Tilt / Pitch Axis) ---
     # Shifted slightly forward on the X axis so it doesn't clip the sphere
@@ -109,11 +132,11 @@ def spawn_sentinel(spec, name, x, y):
     # We rotate the capsule 90 degrees so it points forward along the X-axis
     s_cannon.add_geom(
         type=mujoco.mjtGeom.mjGEOM_CYLINDER, 
-        pos=[0.15, 0, 0],
-        size=[0.08, 0.3], 
+        pos=[SENTINEL_DIMENSIONS["cannon_length"] / 2, 0, 0],
+        size=[SENTINEL_DIMENSIONS["cannon_radius"], SENTINEL_DIMENSIONS["cannon_length"] / 2], 
         rgba=[0.8, 0.1, 0.1, 1], 
         euler=[0, 90, 0], 
-        mass=2.0
+        mass=SENTINEL_MASSES["cannon"]
     )
     
     # --- Actuators ---

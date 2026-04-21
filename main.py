@@ -125,7 +125,7 @@ def main():
             for motor_id in right_motors:
                 data.ctrl[motor_id] = right_torque
 
-            # === ENEMY AI TRACKING ===
+            # === RAMMER ENEMY AI TRACKING ===
             # Get the player's exact 2D position (X, Y)
             player_pos = data.body("player_rover").xpos[:2]
 
@@ -166,6 +166,53 @@ def main():
                     data.actuator(f"{hazards.RAMMER_BASE_NAME}{i}_ml").ctrl[0] = r_left_torque
                     data.actuator(f"{hazards.RAMMER_BASE_NAME}{i}_mr").ctrl[0] = r_right_torque
             # ==========================
+
+            # === SENTINEL TURRET AI TRACKING ===
+            # Get the player's 3D center of mass
+            player_pos_3d = data.body("player_rover").xpos
+            
+            for i in range(NUM_SENTINELS): # Assuming num_sentinels = 2
+                # --- PAN (Yaw) CONTROL ---
+                head_pos = data.body(f"{hazards.SENTINEL_BASE_NAME}{i}_head").xpos
+                direction = player_pos_3d - head_pos
+                dist_2d = np.linalg.norm(direction[:2])
+                
+                if dist_2d > 0.1:
+                    dir_2d = direction[:2] / dist_2d
+                    
+                    # Get the Head's current forward vector in 2D
+                    head_mat = data.body(f"{hazards.SENTINEL_BASE_NAME}{i}_head").xmat.reshape(3, 3)
+                    head_forward_2d = head_mat[:, 0][:2]
+                    head_forward_2d = head_forward_2d / np.linalg.norm(head_forward_2d)
+                    
+                    # Cross product for Left/Right error
+                    pan_error = head_forward_2d[0] * dir_2d[1] - head_forward_2d[1] * dir_2d[0]
+                    
+                    # Apply Torque (Multiplier defines tracking aggressiveness)
+                    data.actuator(f"{hazards.SENTINEL_BASE_NAME}{i}_mpan").ctrl[0] = pan_error * hazards.SENTINEL_MAX_PAN_CONTROL
+
+
+                # --- TILT (Pitch) CONTROL ---
+                cannon_pos = data.body(f"{hazards.SENTINEL_BASE_NAME}{i}_cannon").xpos
+                dir_3d = player_pos_3d - cannon_pos
+                dist_3d = np.linalg.norm(dir_3d)
+                
+                if dist_3d > 0.1:
+                    dir_3d = dir_3d / dist_3d
+                    
+                    # Get the Cannon's current UP vector (Z-axis is column 2)
+                    cannon_mat = data.body(f"{hazards.SENTINEL_BASE_NAME}{i}_cannon").xmat.reshape(3, 3)
+                    cannon_up_3d = cannon_mat[:, 2]
+                    
+                    # Dot product of the Up vector and the Target vector
+                    # If this is positive, the target is "above" the barrel
+                    tilt_error = np.dot(cannon_up_3d, dir_3d)
+                    
+                    # Apply Torque
+                    # (Note: depending on the hinge's right-hand rule, we may need to invert this sign. 
+                    # If it aims AWAY from you, change this to positive!)
+                    data.actuator(f"{hazards.SENTINEL_BASE_NAME}{i}_mtilt").ctrl[0] = -tilt_error * hazards.SENTINEL_MAX_TILT_CONTROL
+            # ============================
             
             # step the simulation forward
             mujoco.mj_step(model, data)
