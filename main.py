@@ -2,6 +2,7 @@ import time
 import os
 import mujoco
 import mujoco.viewer
+from assets import hazards
 
 # A state tracker to manage continuous input from discrete key presses. This is necessary because the key callback only triggers on key press events, not on key release events.
 class RoverControl:
@@ -45,7 +46,12 @@ def main():
     scene_path = os.path.join(assets_dir, "multidroid_scene.xml")
 
     # initialize the scene and simulation
-    model = mujoco.MjModel.from_xml_path(scene_path)
+    spec = mujoco.MjSpec.from_file(scene_path)
+
+    # programmatically add enemies to the scene by modifying the MjSpec in memory before compiling it into a model
+    hazards.spawn_enemies(spec, num_rammers=3, num_sentinels=2)
+
+    model = spec.compile()
     data = mujoco.MjData(model)
 
     # setup lighting shadow box to track the rover and ensure it casts shadows on the ground
@@ -86,6 +92,8 @@ def main():
         # Run the simulation loop
         while viewer.is_running():
             step_start_time = time.time()
+
+            #print(f"Shadow box extent radius: {model.stat.extent}")
 
             # update the shadow box position to track the rover's position
             #print(f"Light pos before update: {model.light_pos[light_id]}")
