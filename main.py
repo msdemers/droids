@@ -4,13 +4,24 @@ import mujoco
 import mujoco.viewer
 from assets import hazards
 
+# Design parameters
+# Rover Parameters
+ROVER_MAX_THROTTLE = 50.0
+ROVER_THROTTLE_STEP = 10.0
+
+# Hazard Parameters
+NUM_RAMMERS = 3
+RAMMER_MAX_THROTTLE = 20.0
+NUM_SENTINELS = 2
+
+
 # A state tracker to manage continuous input from discrete key presses. This is necessary because the key callback only triggers on key press events, not on key release events.
 class RoverControl:
     def __init__(self):
         self.forward = 0.0
         self.turn = 0.0
-        self.throttle_step = 10.0
-        self.max_throttle = 50.0
+        self.throttle_step = ROVER_THROTTLE_STEP
+        self.max_throttle = ROVER_MAX_THROTTLE
 
 control = RoverControl()
 
@@ -49,7 +60,7 @@ def main():
     spec = mujoco.MjSpec.from_file(scene_path)
 
     # programmatically add enemies to the scene by modifying the MjSpec in memory before compiling it into a model
-    hazards.spawn_enemies(spec, num_rammers=3, num_sentinels=2)
+    hazards.spawn_enemies(spec, num_rammers=NUM_RAMMERS, num_sentinels=NUM_SENTINELS)
 
     model = spec.compile()
     data = mujoco.MjData(model)
