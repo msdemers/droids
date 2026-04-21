@@ -3,6 +3,7 @@ from numpy import random
 import mujoco
 
 RAMMER_BASE_NAME = "rammer_"
+RAMMER_MAX_THROTTLE = 50.0
 SENTINEL_BASE_NAME = "sentinel_"
 
 def spawn_enemies(spec, num_rammers=1, num_sentinels=1):
@@ -67,7 +68,7 @@ def spawn_rammer(spec, name, x, y):
         trntype=mujoco.mjtTrn.mjTRN_JOINT,
         target=rl_joint.name,
         ctrllimited=True, 
-        ctrlrange=[-20.0, 20.0]
+        ctrlrange=[-RAMMER_MAX_THROTTLE, RAMMER_MAX_THROTTLE]
     )
     
     # Right Motor
@@ -76,5 +77,5 @@ def spawn_rammer(spec, name, x, y):
         trntype=mujoco.mjtTrn.mjTRN_JOINT,
         target=rr_joint.name,
         ctrllimited=True, 
-        ctrlrange=[-20.0, 20.0]
+        ctrlrange=[-RAMMER_MAX_THROTTLE, RAMMER_MAX_THROTTLE]
     )

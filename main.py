@@ -1,5 +1,6 @@
 import time
 import os
+import numpy as np
 import mujoco
 import mujoco.viewer
 from assets import hazards
@@ -11,7 +12,6 @@ ROVER_THROTTLE_STEP = 10.0
 
 # Hazard Parameters
 NUM_RAMMERS = 3
-RAMMER_MAX_THROTTLE = 20.0
 NUM_SENTINELS = 2
 
 
@@ -125,6 +125,48 @@ def main():
             for motor_id in right_motors:
                 data.ctrl[motor_id] = right_torque
 
+            # === ENEMY AI TRACKING ===
+            # Get the player's exact 2D position (X, Y)
+            player_pos = data.body("player_rover").xpos[:2]
+
+            for i in range(NUM_RAMMERS): # Assuming num_rammers = 3
+                # Get the Rammer's 2D position
+                rammer_pos = data.body(f"{hazards.RAMMER_BASE_NAME}{i}").xpos[:2]
+                
+                # Get the vector pointing from the rammer to the player
+                direction = player_pos - rammer_pos
+                distance = np.linalg.norm(direction)
+                
+                if distance > 0.1: # Prevent division by zero if they crash perfectly
+                    direction = direction / distance # Normalize
+                    
+                    # Get the Rammer's local forward vector (its X-axis in world space)
+                    # MuJoCo's xmat is a 3x3 rotation matrix. Column 0 is the local X axis.
+                    rammer_mat = data.body(f"{hazards.RAMMER_BASE_NAME}{i}").xmat.reshape(3, 3)
+                    forward = rammer_mat[:, 0][:2]
+                    forward = forward / np.linalg.norm(forward)
+                    
+                    # 2D Cross Product to find turn error (Positive = Player is Left, Negative = Right)
+                    turn_error = forward[0] * direction[1] - forward[1] * direction[0]
+                    
+                    # Dot Product to check if facing the player
+                    face_error = np.dot(forward, direction)
+                    
+                    # AI Controller
+                    # Drive forward if looking generally in the right direction
+                    base_speed = hazards.RAMMER_MAX_THROTTLE if face_error > 0 else 0.0 
+                    
+                    # Turn aggressively based on the cross product error
+                    turn_speed = turn_error * hazards.RAMMER_MAX_THROTTLE 
+
+                    r_left_torque = base_speed - turn_speed
+                    r_right_torque = base_speed + turn_speed
+                    
+                    # Apply to motors
+                    data.actuator(f"{hazards.RAMMER_BASE_NAME}{i}_ml").ctrl[0] = r_left_torque
+                    data.actuator(f"{hazards.RAMMER_BASE_NAME}{i}_mr").ctrl[0] = r_right_torque
+            # ==========================
+            
             # step the simulation forward
             mujoco.mj_step(model, data)
 
