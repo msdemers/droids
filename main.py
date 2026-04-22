@@ -11,8 +11,8 @@ ROVER_MAX_THROTTLE = 50.0
 ROVER_THROTTLE_STEP = 10.0
 
 # Hazard Parameters
-SPAW_X_RANGE = (4, 10)
-SPAW_Y_RANGE = (-10, 10)
+SPAWN_X_RANGE = (4, 10)
+SPAWN_Y_RANGE = (-10, 10)
 NUM_RAMMERS = 3
 NUM_SENTINELS = 2
 
@@ -55,14 +55,13 @@ def main():
     # locate assets
     current_dir = os.path.dirname(os.path.abspath(__file__))
     assets_dir = os.path.join(current_dir, "assets")
-    #scene_path = os.path.join(assets_dir, "scene.xml")
     scene_path = os.path.join(assets_dir, "multidroid_scene.xml")
 
     # initialize the scene and simulation
     spec = mujoco.MjSpec.from_file(scene_path)
 
     # programmatically add enemies to the scene by modifying the MjSpec in memory before compiling it into a model
-    hazards.spawn_enemies(spec, x_range=SPAW_X_RANGE, y_range=SPAW_Y_RANGE, num_rammers=NUM_RAMMERS, num_sentinels=NUM_SENTINELS)
+    hazards.spawn_enemies(spec, x_range=SPAWN_X_RANGE, y_range=SPAWN_Y_RANGE, num_rammers=NUM_RAMMERS, num_sentinels=NUM_SENTINELS)
 
     model = spec.compile()
     data = mujoco.MjData(model)
@@ -70,7 +69,7 @@ def main():
     # setup lighting shadow box to track the rover and ensure it casts shadows on the ground
     light_id  = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_LIGHT, "sun_light")
     rover_body_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "player_rover")
-    print(f"Shadow box extent radius: {model.stat.extent}")
+    #print(f"Shadow box extent radius: {model.stat.extent}")
     SAFE_Z_HEIGHT = model.stat.extent/2
 
     # Get the internal ID numbers for our rover motors so we can control them in the simulation loop.
