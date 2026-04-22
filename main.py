@@ -11,6 +11,8 @@ ROVER_MAX_THROTTLE = 50.0
 ROVER_THROTTLE_STEP = 10.0
 
 # Hazard Parameters
+SPAW_X_RANGE = (4, 10)
+SPAW_Y_RANGE = (-10, 10)
 NUM_RAMMERS = 3
 NUM_SENTINELS = 2
 
@@ -60,7 +62,7 @@ def main():
     spec = mujoco.MjSpec.from_file(scene_path)
 
     # programmatically add enemies to the scene by modifying the MjSpec in memory before compiling it into a model
-    hazards.spawn_enemies(spec, num_rammers=NUM_RAMMERS, num_sentinels=NUM_SENTINELS)
+    hazards.spawn_enemies(spec, x_range=SPAW_X_RANGE, y_range=SPAW_Y_RANGE, num_rammers=NUM_RAMMERS, num_sentinels=NUM_SENTINELS)
 
     model = spec.compile()
     data = mujoco.MjData(model)

@@ -26,15 +26,15 @@ SENTINEL_MASSES = {
 SENTINEL_MAX_PAN_CONTROL = 100.0
 SENTINEL_MAX_TILT_CONTROL = 100.0
 
-def spawn_enemies(spec, num_rammers=1, num_sentinels=1):
+def spawn_enemies(spec, x_range=(-8, 8), y_range=(-8, 8), num_rammers=1, num_sentinels=1):
     """Programmatically builds enemy droids in memory using MjSpec."""
     
     for i in range(num_rammers):
-        x, y = random.uniform(-8, 8), random.uniform(-8, 8)
+        x, y = random.uniform(x_range[0], x_range[1]), random.uniform(y_range[0], y_range[1])
         spawn_rammer(spec, name=f"{RAMMER_BASE_NAME}{i}", x=x, y=y)
 
     for i in range(num_sentinels):
-        x, y = random.uniform(-8, 8), random.uniform(-8, 8)
+        x, y = random.uniform(x_range[0], x_range[1]), random.uniform(y_range[0], y_range[1])
         spawn_sentinel(spec, name=f"{SENTINEL_BASE_NAME}{i}", x=x, y=y)
 
 def spawn_rammer(spec, name, x, y):
