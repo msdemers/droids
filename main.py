@@ -53,10 +53,10 @@ def keyboard_callback(keycode):
                 control.turn = 0.0     # Stop turning
             case 32: # space bar for firing
                 control.fire = True
-            case 50: # '2' Key (Tilt Up)
+            case 50: # '2' Key (Cannon Tilt Up)
                 # Note: Rotating around +Y pitches the barrel down, so we subtract to pitch up
                 control.gun_tilt = max(control.gun_tilt - control.tilt_step, -control.max_tilt)
-            case 49: # '1' Key (Tilt Down)
+            case 49: # '1' Key (Cannon Tilt Down)
                 control.gun_tilt = min(control.gun_tilt + control.tilt_step, control.max_tilt)
     except ValueError:
         # Ignore weirdness with keyboard shortcuts defined for the viewer
