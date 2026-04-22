@@ -9,6 +9,9 @@ from assets import hazards
 # Rover Parameters
 ROVER_MAX_THROTTLE = 50.0
 ROVER_THROTTLE_STEP = 10.0
+PLAYER_MAGAZINE_SIZE = 10
+PLAYER_BULLET_SPEED = 50.0
+BULLET_BASE_NAME = "bullet_"
 
 # Hazard Parameters
 SPAWN_X_RANGE = (4, 10)
@@ -24,6 +27,7 @@ class RoverControl:
         self.turn = 0.0
         self.throttle_step = ROVER_THROTTLE_STEP
         self.max_throttle = ROVER_MAX_THROTTLE
+        self.fire = False
 
 control = RoverControl()
 
@@ -39,9 +43,11 @@ def keyboard_callback(keycode):
                 control.turn = min(control.turn + control.throttle_step, control.max_throttle)     # Turn left
             case 262:
                 control.turn = max(control.turn - control.throttle_step, -control.max_throttle)    # Turn right
-            case 32:
+            case 340: # Left Shift for braking
                 control.forward = 0.0  # Stop forward/backward movement
                 control.turn = 0.0     # Stop turning
+            case 32: # space bar for firing
+                control.fire = True
     except ValueError:
         # Ignore weirdness with keyboard shortcuts defined for the viewer
         pass
@@ -62,6 +68,20 @@ def main():
 
     # programmatically add enemies to the scene by modifying the MjSpec in memory before compiling it into a model
     hazards.spawn_enemies(spec, x_range=SPAWN_X_RANGE, y_range=SPAWN_Y_RANGE, num_rammers=NUM_RAMMERS, num_sentinels=NUM_SENTINELS)
+
+    # spaw player bullets and hide in a separate location until needed
+    for i in range(PLAYER_MAGAZINE_SIZE):
+        # Store them at Z = -10 so they are safely out of the way
+        bullet = spec.worldbody.add_body(name=f"{BULLET_BASE_NAME}{i}", pos=[0, 1+i/10, 0.1])
+        bullet.add_freejoint()
+        # Small, dense, glowing yellow spheres
+        bullet.add_geom(
+            type=mujoco.mjtGeom.mjGEOM_SPHERE, 
+            size=[0.03], 
+            rgba=[1.0, 0.9, 0.2, 1], 
+            mass=0.5
+        )
+
 
     model = spec.compile()
     data = mujoco.MjData(model)
@@ -106,6 +126,14 @@ def main():
         viewer.cam.elevation = -30.0   # Angle looking down (negative means looking down)
         viewer.cam.azimuth = 90.0      # Orbit angle around the rover
         # -----------------------------
+
+        # --- Player firing setup ---
+        # Setup bullet tracking
+        next_bullet_idx = 0
+        # Get the internal ID for the muzzle site on the rover, 
+        # which is where bullets teleport to and launch from
+        muzzle_site_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, "muzzle")
+
         
         # Run the simulation loop
         while viewer.is_running():
@@ -221,6 +249,37 @@ def main():
                     data.actuator(f"{hazards.SENTINEL_BASE_NAME}{i}_mtilt").ctrl[0] = -tilt_error * hazards.SENTINEL_MAX_TILT_CONTROL
             # ============================
             
+
+            # === WEAPON FIRING LOGIC ===
+            if control.fire:
+                # Get the exact world position and orientation of the muzzle site
+                muzzle_pos = data.site_xpos[muzzle_site_id]
+                muzzle_mat = data.site_xmat[muzzle_site_id].reshape(3, 3)
+                
+                # The muzzle's local X-axis (forward) in world space is its bore axis
+                forward_vec = muzzle_mat[:, 0] 
+
+                # Look up the internal memory addresses for the next bullet's physics state
+                bullet_body_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, f"{BULLET_BASE_NAME}{next_bullet_idx}")
+                jnt_id = model.body_jntadr[bullet_body_id]
+                qpos_adr = model.jnt_qposadr[jnt_id]
+                qvel_adr = model.jnt_dofadr[jnt_id]
+
+                # STATE TELEPORTATION
+                # Overwrite the bullet's X, Y, Z position to exactly match the muzzle
+                data.qpos[qpos_adr : qpos_adr+3] = muzzle_pos
+                
+                # Overwrite the bullet's linear velocity to shoot forward
+                data.qvel[qvel_adr : qvel_adr+3] = forward_vec * PLAYER_BULLET_SPEED
+                
+                # Overwrite the bullet's angular velocity to 0 so it doesn't hook/curve wildly
+                data.qvel[qvel_adr+3 : qvel_adr+6] = [0, 0, 0]
+
+                # 4. Cycle the magazine
+                next_bullet_idx = (next_bullet_idx + 1) % PLAYER_MAGAZINE_SIZE
+                control.fire = False
+            # ===========================
+
             # step the simulation forward
             mujoco.mj_step(model, data)
 

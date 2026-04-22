@@ -19,7 +19,7 @@
                 
                 <geom type="cylinder" size="0.03 0.4" pos="0.4 0 0.05" euler="0 90 0" rgba="0.1 0.1 0.1 1" mass="1"/>
                 
-                <site name="muzzle" pos="0.6 0 0.05" size="0.01" rgba="1 0 0 0"/>
+                <site name="muzzle" pos="0.85 0 0.05" size="0.01" rgba="1 0 0 0"/>
             </body>
 
             <body name="wheel_fl" pos="0.4 0.35 0">
