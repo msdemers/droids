@@ -9,6 +9,8 @@ from assets import hazards
 # Rover Parameters
 ROVER_MAX_THROTTLE = 50.0
 ROVER_THROTTLE_STEP = 10.0
+ROVER_MAX_TILT = 0.1 # 5-6 degrees
+ROVER_MAX_TILT_STEP = 0.05 # radians per key press
 PLAYER_MAGAZINE_SIZE = 10
 PLAYER_BULLET_SPEED = 50.0
 BULLET_BASE_NAME = "bullet_"
@@ -27,6 +29,9 @@ class RoverControl:
         self.turn = 0.0
         self.throttle_step = ROVER_THROTTLE_STEP
         self.max_throttle = ROVER_MAX_THROTTLE
+        self.gun_tilt = 0.0
+        self.tilt_step = ROVER_MAX_TILT_STEP
+        self.max_tilt = ROVER_MAX_TILT
         self.fire = False
 
 control = RoverControl()
@@ -48,6 +53,11 @@ def keyboard_callback(keycode):
                 control.turn = 0.0     # Stop turning
             case 32: # space bar for firing
                 control.fire = True
+            case 50: # '2' Key (Tilt Up)
+                # Note: Rotating around +Y pitches the barrel down, so we subtract to pitch up
+                control.gun_tilt = max(control.gun_tilt - control.tilt_step, -control.max_tilt)
+            case 49: # '1' Key (Tilt Down)
+                control.gun_tilt = min(control.gun_tilt + control.tilt_step, control.max_tilt)
     except ValueError:
         # Ignore weirdness with keyboard shortcuts defined for the viewer
         pass
@@ -104,6 +114,9 @@ def main():
         mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, "motor_br"),
     ]
 
+    # Get the internal ID for the gun servo
+    tilt_actuator_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, "act_gun_tilt")
+
     # Launch the passive viewer for rendering the sim/game
     with mujoco.viewer.launch_passive(
         model, 
@@ -159,6 +172,9 @@ def main():
                 data.ctrl[motor_id] = left_torque
             for motor_id in right_motors:
                 data.ctrl[motor_id] = right_torque
+
+            # Apply position control to the gun servo
+            data.ctrl[tilt_actuator_id] = control.gun_tilt
 
             # === RAMMER ENEMY AI TRACKING ===
             # Get the player's exact 2D position (X, Y)
