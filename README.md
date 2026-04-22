@@ -10,10 +10,10 @@ The goal of this project is to explore kinematics, collision detection, and rigi
 
 ## 🛠 Project Structure
 
-  * `main.py`: The core game loop, user input handling, and MuJoCo viewer synchronization.
-  * `assets/scene.xml`: The MuJoCo XML (MJCF) file defining the physical world, the scene, and the Droid chassis.
+  * `main.py`: The core game loop, user input handling, enemy behavior, and the MuJoCo viewer synchronization.
+  * `assets/`: The directory containing the core MuJoCo XML (MJCF) file, the player rover droid, and programatically spawned hazards/enemies.
 
-## 🚀 Quickstart
+## 🚀 Installation
 
 This project uses [`uv`](https://www.google.com/search?q=%5Bhttps://github.com/astral-sh/uv%5D\(https://github.com/astral-sh/uv\)) to manage dependencies and Python environments for lightning-fast, reproducible setups.
 
@@ -62,3 +62,16 @@ macOS is strict about how graphical applications are launched. To run the MuJoCo
     uv run mjpython main.py
     ```
     *(`mjpython` is a wrapper included with MuJoCo that handles macOS graphical window entitlements).*
+
+## 🎮 Controls
+
+The rover uses a skid-steer drive system and features an articulated physics-based cannon. Check your terminal while playing for a live telemetry HUD!
+
+| System | Action | Input |
+| :--- | :--- | :--- |
+| **Driving** | Throttle Forward / Reverse | <kbd>↑</kbd> <kbd>↓</kbd> |
+| | Turn Left / Right | <kbd>←</kbd> <kbd>→</kbd> |
+| | Brake / Cut Throttle | <kbd>Left Shift</kbd> |
+| **Weapons** | Cannon Pitch Up | <kbd>2</kbd> |
+| | Cannon Pitch Down | <kbd>1</kbd> |
+| | Fire Weapon | <kbd>Space</kbd> |
