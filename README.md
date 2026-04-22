@@ -1,6 +1,10 @@
 # Droids ☄️🤖
 
-A classic *Asteroids*-style game rebuilt from the ground up as a 3D rigid-body physics simulation using the **MuJoCo** physics engine.
+A classic *Asteroids*-style game rebuilt from the ground up as a 3D rigid-body physics simulation using the **MuJoCo** physics engine. It's *Asteroids*-style in that the player navigates a 2-D environment to avoid enemies. However:
+1. Those enemies aim for you.
+2. Some of them shoot at you.
+3. You're driving a skid-steer rover, not flying a ship.
+4. The 3-D physics yeild much more interesting interactions and consequences.
 
 The goal of this project is to explore kinematics, collision detection, and rigid-body forces in an interactive, playful environment.
 
@@ -42,17 +46,18 @@ macOS is strict about how graphical applications are launched. To run the MuJoCo
     cd droids
     ```
 3.  **Build the environment targeting the Framework build:**
-    If you used the python.org installer, run
+
+    *If* you used the python.org installer, run
     ```bash
     uv venv --python /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12
     uv sync
     ```
-    If you used hombrew, run 
+    *Otherwise, if* you used hombrew, run 
     ```bash
     uv venv --python /opt/homebrew/bin/python3.12
     uv sync
     ```
-4.  **Run the simulation using `mjpython`:**
+5.  **Run the simulation using `mjpython`:**
     ```bash
     uv run mjpython main.py
     ```
