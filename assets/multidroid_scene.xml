@@ -3,7 +3,7 @@
 
     <default>
         <joint type="hinge" axis="0 1 0" damping="5.0"/>
-        <geom friction="1 0.005 0.0001"/>
+        <geom friction="1.2 0.1 0.1" condim="6" solref="0.02 2" margin="0.01"/>
     </default>
 
     <asset>
