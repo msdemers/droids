@@ -84,7 +84,13 @@ def main():
     ]
 
     # Launch the passive viewer for rendering the sim/game
-    with mujoco.viewer.launch_passive(model, data, key_callback=keyboard_callback) as viewer:
+    with mujoco.viewer.launch_passive(
+        model, 
+        data, 
+        key_callback=keyboard_callback,
+        show_left_ui=False,
+        show_right_ui=False
+        ) as viewer:
         
         # --- CAMERA TRACKING SETUP ---
         # Get the internal ID of our new fixed camera
