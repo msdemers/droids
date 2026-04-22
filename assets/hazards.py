@@ -9,7 +9,7 @@ RAMMER_MAX_THROTTLE = 50.0
 SENTINEL_BASE_NAME = "sentinel_"
 SENTINEL_DIMENSIONS = {
     "base_height": 0.2,
-    "base_radius": 0.4,
+    "base_width": 0.8,
     "neck_height": 0.4,
     "neck_radius": 0.1,
     "head_radius": 0.2,
@@ -97,8 +97,8 @@ def spawn_sentinel(spec, name, x, y):
     s_base.add_freejoint()
     # Mass=50 makes it incredibly hard for the player to push around
     s_base.add_geom(
-        type=mujoco.mjtGeom.mjGEOM_CYLINDER, 
-        size=[SENTINEL_DIMENSIONS["base_radius"], SENTINEL_DIMENSIONS["base_height"] / 2], 
+        type=mujoco.mjtGeom.mjGEOM_BOX, 
+        size=[SENTINEL_DIMENSIONS["base_width"] / 2, SENTINEL_DIMENSIONS["base_width"] / 2,SENTINEL_DIMENSIONS["base_height"] / 2], 
         rgba=[0.2, 0.2, 0.2, 1], 
         mass=SENTINEL_MASSES["base"]
     )
