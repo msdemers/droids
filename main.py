@@ -1,5 +1,7 @@
+import math
 import time
 import os
+import sys
 import numpy as np
 import mujoco
 import mujoco.viewer
@@ -296,6 +298,19 @@ def main():
                 control.fire = False
             # ===========================
 
+            # === TELEMETRY HUD ===
+            # Convert radians to degrees for human readability
+            tilt_deg = math.degrees(control.gun_tilt)
+            
+            # Format a clean string that aggressively overwrites the current terminal line (\r)
+            hud_text = f"\r🤖 [TELEMETRY] | Left Motors: {left_torque:>5.1f} | Right Motors: {right_torque:>5.1f} | Cannon Pitch: {tilt_deg:>5.1f}°  "
+            
+            # Write and instantly flush the buffer to the console
+            sys.stdout.write(hud_text)
+            sys.stdout.flush()
+            # =====================
+
+
             # step the simulation forward
             mujoco.mj_step(model, data)
 
@@ -310,3 +325,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    print() # Print a newline after the telemetry HUD to ensure we return to the user prompt on exit
