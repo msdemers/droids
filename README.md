@@ -1,5 +1,7 @@
 # Droids ☄️🤖
 
+https://github.com/user-attachments/assets/75aaf3be-cdb9-4fe5-9581-b8c1bbfc3be2
+
 A classic *Asteroids*-style game rebuilt from the ground up as a 3D rigid-body physics simulation using the **MuJoCo** physics engine. It's *Asteroids*-style in that the player navigates a 2-D environment to avoid enemies. However:
 1. Those enemies aim for you.
 2. Some of them shoot at you.
