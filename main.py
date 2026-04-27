@@ -15,13 +15,19 @@ ROVER_MAX_TILT = 0.1 # 5-6 degrees
 ROVER_MAX_TILT_STEP = 0.05 # radians per key press
 PLAYER_MAGAZINE_SIZE = 10
 PLAYER_BULLET_SPEED = 50.0
-BULLET_BASE_NAME = "bullet_"
+BULLET_BASE_NAME = "player_bullet_"
 
 # Hazard Parameters
 SPAWN_X_RANGE = (4, 10)
 SPAWN_Y_RANGE = (-10, 10)
 NUM_RAMMERS = 3
 NUM_SENTINELS = 2
+NUM_ENEMY_BULLETS = 20
+ENEMY_BULLET_SPEED = 30.0
+ENEMY_BULLET_BASE_NAME = "enemy_bullet_"
+SENTINEL_FIRE_RATE = 1.5 # Seconds between shots
+SENTINEL_AIM_ACCURACY_THRESHOLD = 0.95 # Cosine similarity threshold for firing (1.0 is perfect alignment)
+    
 
 
 # A state tracker to manage continuous input from discrete key presses. This is necessary because the key callback only triggers on key press events, not on key release events.
@@ -94,6 +100,21 @@ def main():
             mass=0.5
         )
 
+    
+    # build the enemy bullet pool
+    for i in range(NUM_ENEMY_BULLETS):
+        # Suspend them high in the sky at Z = 50, offset on the Y axis
+        bullet = spec.worldbody.add_body(name=f"{ENEMY_BULLET_BASE_NAME}{i}", pos=[i*0.1, 1, 0.1])
+        bullet.add_freejoint()
+        # Glowing red spheres
+        bullet.add_geom(
+            type=mujoco.mjtGeom.mjGEOM_SPHERE, 
+            size=[0.02], 
+            rgba=[1.0, 0.1, 0.1, 1], 
+            mass=0.5
+        )
+    # -----------------------------------
+
 
     model = spec.compile()
     data = mujoco.MjData(model)
@@ -142,14 +163,18 @@ def main():
         viewer.cam.azimuth = 90.0      # Orbit angle around the rover
         # -----------------------------
 
-        # --- Player firing setup ---
+        # --- Player weapon firing setup ---
         # Setup bullet tracking
         next_bullet_idx = 0
         # Get the internal ID for the muzzle site on the rover, 
         # which is where bullets teleport to and launch from
         muzzle_site_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, "muzzle")
 
-        
+        # --- Enemy weapon firing setup ---
+        # Enemy weapon tracking
+        next_enemy_bullet_idx = 0
+        sentinel_cooldowns = [0.0] * NUM_SENTINELS
+
         # Run the simulation loop
         while viewer.is_running():
             step_start_time = time.time()
@@ -265,10 +290,42 @@ def main():
                     # (Note: depending on the hinge's right-hand rule, we may need to invert this sign. 
                     # If it aims AWAY from you, change this to positive!)
                     data.actuator(f"{hazards.SENTINEL_BASE_NAME}{i}_mtilt").ctrl[0] = -tilt_error * hazards.SENTINEL_MAX_TILT_CONTROL
+            
+                # --- AI FIRING LOGIC ---
+                # Decrease the cooldown timer by the physics timestep
+                if sentinel_cooldowns[i] > 0:
+                    sentinel_cooldowns[i] -= model.opt.timestep
+                
+                # Get the cannon's local X-axis (Forward vector) in world space
+                cannon_forward_3d = cannon_mat[:, 0]
+                
+                # Check cannon bore axis alignment to the player direction (1.0 is perfect alignment)
+                aim_accuracy = np.dot(cannon_forward_3d, dir_3d)
+                
+                # If aim is good and weapon is reloaded, FIRE!
+                if aim_accuracy > SENTINEL_AIM_ACCURACY_THRESHOLD and sentinel_cooldowns[i] <= 0:
+                    # 1. Get the muzzle position
+                    s_muzzle_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, f"{hazards.SENTINEL_BASE_NAME}{i}_muzzle")
+                    s_muzzle_pos = data.site_xpos[s_muzzle_id]
+                    
+                    # 2. Get the memory addresses for the next enemy bullet
+                    ebullet_body_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, f"{ENEMY_BULLET_BASE_NAME}{next_enemy_bullet_idx}")
+                    ejnt_id = model.body_jntadr[ebullet_body_id]
+                    eqpos_adr = model.jnt_qposadr[ejnt_id]
+                    eqvel_adr = model.jnt_dofadr[ejnt_id]
+                    
+                    # 3. Teleport and shoot!
+                    data.qpos[eqpos_adr : eqpos_adr+3] = s_muzzle_pos
+                    data.qvel[eqvel_adr : eqvel_adr+3] = cannon_forward_3d * ENEMY_BULLET_SPEED
+                    data.qvel[eqvel_adr+3 : eqvel_adr+6] = [0, 0, 0] # Kill spin
+                    
+                    # 4. Cycle magazine and reset cooldown
+                    next_enemy_bullet_idx = (next_enemy_bullet_idx + 1) % NUM_ENEMY_BULLETS
+                    sentinel_cooldowns[i] = SENTINEL_FIRE_RATE
             # ============================
             
 
-            # === WEAPON FIRING LOGIC ===
+            # === PLAYER WEAPON FIRING LOGIC ===
             if control.fire:
                 # Get the exact world position and orientation of the muzzle site
                 muzzle_pos = data.site_xpos[muzzle_site_id]

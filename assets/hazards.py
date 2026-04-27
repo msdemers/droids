@@ -177,6 +177,14 @@ def spawn_sentinel(spec, name, x, y):
         euler=[0, 90, 0], 
         mass=SENTINEL_MASSES["cannon"]
     )
+
+    # The Muzzle Site for the Sentinel
+    s_cannon.add_site(
+        name=f"{name}_muzzle",
+        pos=[SENTINEL_DIMENSIONS["cannon_length"] + 0.05, 0, 0],
+        size=[0.01],
+        rgba=[1, 0, 0, 0] # Invisible
+    )
     
     # --- Actuators ---
     spec.add_actuator(
