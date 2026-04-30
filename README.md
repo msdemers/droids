@@ -9,7 +9,7 @@ A classic *Asteroids*-style game rebuilt from the ground up as a 3D rigid-body p
 1. Those enemies aim for you.
 2. Some of them shoot at you.
 3. You're driving a skid-steer rover, not flying a ship.
-4. The 3-D physics yeild much more interesting interactions and consequences.
+4. The 3-D physics yield much more interesting interactions and consequences.
 
 The goal of this project is to explore kinematics, collision detection, and rigid-body forces in an interactive, playful environment.
 
