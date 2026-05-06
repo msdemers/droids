@@ -1,5 +1,6 @@
 <mujoco>
     <option gravity="0 0 -1.62"/>
+    <statistic extent="6" center="0 0 0"/>
 
     <default>
         <joint type="hinge" axis="0 1 0" damping="5.0"/>
