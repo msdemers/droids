@@ -30,8 +30,8 @@ SENTINEL_DIMENSIONS = {
     "neck_height": 0.4,
     "neck_radius": 0.1,
     "head_radius": 0.2,
-    "cannon_length": 0.3,
-    "cannon_radius": 0.08
+    "cannon_length": 0.4,
+    "cannon_radius": 0.04
 }
 SENTINEL_MASSES = {
     "base": 50.0,
@@ -64,7 +64,7 @@ def spawn_rammer(spec, name, x, y):
     enemy_body.add_geom(
         type=mujoco.mjtGeom.mjGEOM_BOX,
         size=[RAMMER_DIMENSIONS["length"]/2, RAMMER_DIMENSIONS["width"]/2, RAMMER_DIMENSIONS["height"]/2], 
-        rgba=[0.8, 0.1, 0.1, 1],
+        material="tank_green",
         mass=10.0
     )
     
@@ -78,7 +78,7 @@ def spawn_rammer(spec, name, x, y):
     rl_wheel.add_geom(
         type=mujoco.mjtGeom.mjGEOM_CYLINDER, 
         size=[RAMMER_DIMENSIONS["wheel_radius"], RAMMER_DIMENSIONS["wheel_width"]/2], 
-        rgba=[0.1, 0.1, 0.1, 1], 
+        material="rover_tires", 
         euler=[90, 0, 0],
         mass=RAMMER_MASSES["rear_wheel"]
     )
@@ -93,7 +93,7 @@ def spawn_rammer(spec, name, x, y):
     rr_wheel.add_geom(
         type=mujoco.mjtGeom.mjGEOM_CYLINDER, 
         size=[RAMMER_DIMENSIONS["wheel_radius"], RAMMER_DIMENSIONS["wheel_width"]/2], 
-        rgba=[0.1, 0.1, 0.1, 1], 
+        material="rover_tires", 
         euler=[90, 0, 0],
         mass=RAMMER_MASSES["rear_wheel"]
     )
@@ -109,7 +109,7 @@ def spawn_rammer(spec, name, x, y):
     f_wheel.add_geom(
         type=mujoco.mjtGeom.mjGEOM_SPHERE, 
         size=[RAMMER_DIMENSIONS["wheel_radius"]], 
-        rgba=[0.5, 0.5, 0.5, 1],
+        material="rover_tires",
         mass=RAMMER_MASSES["front_wheel"]
     )
 
@@ -141,7 +141,7 @@ def spawn_sentinel(spec, name, x, y):
     s_base.add_geom(
         type=mujoco.mjtGeom.mjGEOM_BOX, 
         size=[SENTINEL_DIMENSIONS["base_width"] / 2, SENTINEL_DIMENSIONS["base_width"] / 2,SENTINEL_DIMENSIONS["base_height"] / 2], 
-        rgba=[0.2, 0.2, 0.2, 1], 
+        material="space_ceramic", 
         mass=SENTINEL_MASSES["base"]
     )
 
@@ -151,7 +151,7 @@ def spawn_sentinel(spec, name, x, y):
     s_neck.add_geom(
         type=mujoco.mjtGeom.mjGEOM_CYLINDER, 
         size=[SENTINEL_DIMENSIONS["neck_radius"], SENTINEL_DIMENSIONS["neck_height"] / 2], 
-        rgba=[0.2, 0.2, 0.2, 1], 
+        material="space_ceramic", 
         mass=SENTINEL_MASSES["neck"]
     )
     
@@ -161,7 +161,7 @@ def spawn_sentinel(spec, name, x, y):
     s_head.add_geom(
         type=mujoco.mjtGeom.mjGEOM_SPHERE, 
         size=[SENTINEL_DIMENSIONS["head_radius"]], 
-        rgba=[0.8, 0.6, 0.1, 1], 
+        material="space_ceramic", 
         mass=SENTINEL_MASSES["head"]
     )
     
@@ -173,7 +173,7 @@ def spawn_sentinel(spec, name, x, y):
         type=mujoco.mjtGeom.mjGEOM_CYLINDER, 
         pos=[SENTINEL_DIMENSIONS["cannon_length"] / 2, 0, 0],
         size=[SENTINEL_DIMENSIONS["cannon_radius"], SENTINEL_DIMENSIONS["cannon_length"] / 2], 
-        rgba=[0.8, 0.1, 0.1, 1], 
+        material="gold",
         euler=[0, 90, 0], 
         mass=SENTINEL_MASSES["cannon"]
     )
