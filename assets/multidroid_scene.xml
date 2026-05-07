@@ -7,6 +7,8 @@
         <geom friction="1.2 0.1 0.1" condim="6" solref="0.02 2"/>
     </default>
 
+    <include file="materials.xml"/>
+    
     <asset>
         <texture name="checker_tex" type="2d" builtin="checker" rgb1="0.3 0.3 0.3" rgb2="0.4 0.4 0.4" width="512" height="512"/>
         <material name="checker_pattern" texture="checker_tex" texrepeat="20 20" texuniform="true"/>
