@@ -20,6 +20,11 @@
         <material name="lunar_terrain_mat" texture="lunar_terrain_tex" texrepeat="1 1" texuniform="true"/>
         <hfield name="lunar_terrain_hfield" file="moon_meteor_02_disp_2k.png" size="20 20 0.5 0.1"/>
 
+        <texture type="skybox" builtin="gradient" 
+            rgb1="0.0 0.0 0.0" rgb2="0.02 0.02 0.05" 
+            width="1024" height="1024" 
+            mark="random" markrgb="1 1 1" random="0.005"/>
+
     </asset>
 
     <visual>
